@@ -1,110 +1,256 @@
 @import "tailwindcss";
 
-/* ------------------------------------------------------------------ *
- * Design tokens.  Light is the bare :root; dark is re-declared under
- * both the OS media query (guarded so an explicit light choice wins)
- * and the [data-theme="dark"] scope the theme toggle stamps.
- * ------------------------------------------------------------------ */
+/* =============================================================================
+ * Design tokens: shadcn/ui "new-york" style, dark-first (this is an ops
+ * console). Neutral base + one blue accent. Chart colours are the
+ * colour-blind-validated blue / orange / aqua set, kept as raw hex.
+ *
+ * Dark is re-declared under both the OS media query (guarded so an explicit
+ * light choice still wins) and the [data-theme="dark"] scope the toggle stamps.
+ * ========================================================================== */
+
 :root {
   color-scheme: light;
 
-  --page: #f9f9f7;
-  --surface: #fcfcfb;
-  --surface-2: #f2f2ee;
-  --border: rgba(11, 11, 11, 0.1);
-  --ring: #2a78d6;
+  --background: oklch(0.994 0.001 260);
+  --foreground: oklch(0.21 0.012 260);
 
-  --text-primary: #0b0b0b;
-  --text-secondary: #52514e;
-  --text-muted: #898781;
+  --card: oklch(1 0 0);
+  --card-foreground: var(--foreground);
+  --popover: oklch(1 0 0);
+  --popover-foreground: var(--foreground);
 
-  --series-1: #2a78d6;
-  --series-2: #eb6834;
-  --series-3: #1baf7a;
+  --muted: oklch(0.968 0.003 260);
+  --muted-foreground: oklch(0.492 0.011 260);
 
-  --grid: #e1e0d9;
-  --axis: #c3c2b7;
+  --accent: oklch(0.965 0.004 260);
+  --accent-foreground: var(--foreground);
 
-  --good: #0ca30c;
-  --warning: #fab219;
-  --serious: #ec835a;
-  --critical: #d03b3b;
+  --primary: oklch(0.53 0.2 258);
+  --primary-foreground: oklch(0.985 0.002 260);
+
+  --border: oklch(0.916 0.004 260);
+  --input: oklch(0.9 0.005 260);
+  --ring: oklch(0.53 0.2 258);
+
+  --success: oklch(0.58 0.16 150);
+  --warning: oklch(0.7 0.16 75);
+  --danger: oklch(0.58 0.22 22);
+
+  --chart-1: #2a78d6;
+  --chart-2: #eb6834;
+  --chart-3: #1baf7a;
+  --chart-grid: oklch(0.92 0.004 260);
+  --chart-axis: oklch(0.75 0.006 260);
+
+  --radius: 0.625rem;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:where(:not([data-theme="light"])) {
     color-scheme: dark;
 
-    --page: #0d0d0d;
-    --surface: #1a1a19;
-    --surface-2: #232322;
-    --border: rgba(255, 255, 255, 0.1);
-    --ring: #3987e5;
+    --background: oklch(0.168 0.006 265);
+    --foreground: oklch(0.965 0.002 260);
 
-    --text-primary: #ffffff;
-    --text-secondary: #c3c2b7;
-    --text-muted: #898781;
+    --card: oklch(0.205 0.007 265);
+    --card-foreground: var(--foreground);
+    --popover: oklch(0.22 0.008 265);
+    --popover-foreground: var(--foreground);
 
-    --series-1: #3987e5;
-    --series-2: #d95926;
-    --series-3: #199e70;
+    --muted: oklch(0.248 0.008 265);
+    --muted-foreground: oklch(0.68 0.012 260);
 
-    --grid: #2c2c2a;
-    --axis: #383835;
+    --accent: oklch(0.27 0.009 265);
+    --accent-foreground: var(--foreground);
+
+    --primary: oklch(0.64 0.18 254);
+    --primary-foreground: oklch(0.16 0.02 260);
+
+    --border: oklch(1 0 0 / 9%);
+    --input: oklch(1 0 0 / 12%);
+    --ring: oklch(0.64 0.18 254);
+
+    --success: oklch(0.72 0.17 150);
+    --warning: oklch(0.8 0.15 78);
+    --danger: oklch(0.68 0.2 22);
+
+    --chart-1: #3f8ae8;
+    --chart-2: #e56a3d;
+    --chart-3: #22b184;
+    --chart-grid: oklch(1 0 0 / 8%);
+    --chart-axis: oklch(1 0 0 / 20%);
   }
 }
 
 :root[data-theme="dark"] {
   color-scheme: dark;
 
-  --page: #0d0d0d;
-  --surface: #1a1a19;
-  --surface-2: #232322;
-  --border: rgba(255, 255, 255, 0.1);
-  --ring: #3987e5;
+  --background: oklch(0.168 0.006 265);
+  --foreground: oklch(0.965 0.002 260);
 
-  --text-primary: #ffffff;
-  --text-secondary: #c3c2b7;
-  --text-muted: #898781;
+  --card: oklch(0.205 0.007 265);
+  --card-foreground: var(--foreground);
+  --popover: oklch(0.22 0.008 265);
+  --popover-foreground: var(--foreground);
 
-  --series-1: #3987e5;
-  --series-2: #d95926;
-  --series-3: #199e70;
+  --muted: oklch(0.248 0.008 265);
+  --muted-foreground: oklch(0.68 0.012 260);
 
-  --grid: #2c2c2a;
-  --axis: #383835;
+  --accent: oklch(0.27 0.009 265);
+  --accent-foreground: var(--foreground);
+
+  --primary: oklch(0.64 0.18 254);
+  --primary-foreground: oklch(0.16 0.02 260);
+
+  --border: oklch(1 0 0 / 9%);
+  --input: oklch(1 0 0 / 12%);
+  --ring: oklch(0.64 0.18 254);
+
+  --success: oklch(0.72 0.17 150);
+  --warning: oklch(0.8 0.15 78);
+  --danger: oklch(0.68 0.2 22);
+
+  --chart-1: #3f8ae8;
+  --chart-2: #e56a3d;
+  --chart-3: #22b184;
+  --chart-grid: oklch(1 0 0 / 8%);
+  --chart-axis: oklch(1 0 0 / 20%);
 }
 
 @theme inline {
-  --color-page: var(--page);
-  --color-surface: var(--surface);
-  --color-surface-2: var(--surface-2);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
   --color-border: var(--border);
+  --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-text-primary: var(--text-primary);
-  --color-text-secondary: var(--text-secondary);
-  --color-text-muted: var(--text-muted);
-  --color-series-1: var(--series-1);
-  --color-series-2: var(--series-2);
-  --color-series-3: var(--series-3);
-  --color-good: var(--good);
+  --color-success: var(--success);
   --color-warning: var(--warning);
-  --color-serious: var(--serious);
-  --color-critical: var(--critical);
-  --font-sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --color-danger: var(--danger);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+
+  --radius-sm: calc(var(--radius) * 0.75);
+  --radius-md: calc(var(--radius) * 0.875);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 2);
+
+  --font-sans: var(--ff-sans), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: var(--ff-mono), ui-monospace, "SF Mono", Menlo, monospace;
+  --font-display: var(--ff-display), var(--ff-sans), ui-sans-serif, sans-serif;
 }
 
 * {
   border-color: var(--border);
 }
 
-body {
-  background: var(--page);
-  color: var(--text-primary);
-  font-family: var(--font-sans);
-  -webkit-font-smoothing: antialiased;
+html {
+  background: var(--background);
 }
 
-.tabular {
-  font-variant-numeric: tabular-nums;
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Display face on the top of the hierarchy only; card titles (h3) stay sans. */
+h1,
+h2 {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+  font-weight: 600;
+}
+
+/* Numbers that must line up (tables, stat values, axis ticks). */
+.nums {
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum";
+  letter-spacing: -0.01em;
+}
+
+/* Subtle dotted texture behind the page, so large empty areas don't feel
+ * like a blank template. */
+.page-grid {
+  background-image: radial-gradient(
+    var(--border) 0.5px,
+    transparent 0.5px
+  );
+  background-size: 22px 22px;
+  background-position: -1px -1px;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+.live-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-dot {
+    animation: none;
+  }
+}
+
+/* Sheet / overlay transitions (Radix sets data-state open|closed and keeps the
+ * node mounted during the closing animation). */
+@keyframes overlay-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes overlay-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes sheet-in { from { transform: translateX(100%); } to { transform: translateX(0); } }
+@keyframes sheet-out { from { transform: translateX(0); } to { transform: translateX(100%); } }
+
+[data-slot="sheet-overlay"][data-state="open"] { animation: overlay-in 0.18s ease-out; }
+[data-slot="sheet-overlay"][data-state="closed"] { animation: overlay-out 0.16s ease-in; }
+[data-slot="sheet-content"][data-state="open"] { animation: sheet-in 0.22s cubic-bezier(0.32, 0.72, 0, 1); }
+[data-slot="sheet-content"][data-state="closed"] { animation: sheet-out 0.18s ease-in; }
+
+/* Tooltip / hover-card. No `both` fill: content sits visible at rest, so a
+ * stalled animation engine never hides it. */
+@keyframes pop-in {
+  from { opacity: 0; transform: scale(0.96) translateY(2px); }
+}
+[data-slot="tooltip-content"],
+[data-slot="hover-card-content"] {
+  animation: pop-in 0.14s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: var(--radix-tooltip-content-transform-origin,
+    var(--radix-hover-card-content-transform-origin, center));
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-slot="tooltip-content"],
+  [data-slot="hover-card-content"] { animation: none; }
+}
+
+/* Accordion: Radix unmounts closed content, so no stuck-hidden risk. */
+@keyframes acc-open {
+  from { height: 0; }
+  to { height: var(--radix-accordion-content-height); }
+}
+@keyframes acc-close {
+  from { height: var(--radix-accordion-content-height); }
+  to { height: 0; }
+}
+[data-slot="accordion-content"][data-state="open"] {
+  animation: acc-open 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+[data-slot="accordion-content"][data-state="closed"] {
+  animation: acc-close 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-slot="accordion-content"] { animation: none; }
 }

@@ -2,7 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Activity, AlertTriangle, BarChart3, Gauge, LineChart, Layers, Zap } from "lucide-react";
+import {
+  AlertTriangle,
+  BarChart3,
+  Gauge,
+  LineChart,
+  Layers,
+  Plug,
+  Zap,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme-toggle";
 
@@ -20,29 +28,42 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-full flex-col">
-      <header className="sticky top-0 z-10 border-b bg-page/80 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center gap-6 px-4 py-3">
-          <Link href="/overview" className="flex items-center gap-2 font-semibold">
-            <Activity className="h-5 w-5 text-series-1" />
-            <span className="hidden sm:inline">EV Charging Platform</span>
+      <header className="sticky top-0 z-30 border-b bg-background/80 backdrop-blur-md">
+        <div className="mx-auto flex h-14 max-w-[1280px] items-center gap-2 px-4 sm:px-6">
+          <Link
+            href="/overview"
+            className="flex items-center gap-2 rounded-md pr-2 text-sm font-semibold tracking-tight"
+          >
+            <span className="grid size-7 place-items-center rounded-md bg-primary text-primary-foreground">
+              <Plug className="size-4" />
+            </span>
+            <span className="hidden sm:inline">EV&nbsp;Charging</span>
           </Link>
-          <nav className="flex flex-1 flex-wrap items-center gap-1">
+
+          <div className="mx-1 hidden h-5 w-px bg-border sm:block" />
+
+          <nav className="flex flex-1 items-center gap-0.5 overflow-x-auto">
             {OPERATOR_NAV.map((item) => (
               <NavLink key={item.href} {...item} active={pathname === item.href} />
             ))}
-            <span className="mx-1 hidden h-4 w-px bg-border sm:inline-block" />
+            <span className="mx-1.5 h-4 w-px shrink-0 bg-border" />
             {DRIVER_NAV.map((item) => (
               <NavLink key={item.href} {...item} active={pathname === item.href} />
             ))}
           </nav>
+
           <ThemeToggle />
         </div>
       </header>
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">{children}</main>
+
+      <main className="page-grid mx-auto w-full max-w-[1280px] flex-1 px-4 py-8 sm:px-6">
+        {children}
+      </main>
+
       <footer className="border-t">
-        <div className="mx-auto max-w-6xl px-4 py-4 text-xs text-text-muted">
-          EV Charging Intelligence &amp; Optimization Platform — operator &amp; driver views over
-          the FastAPI service. Metrics reflect a synthetic dataset (see project README).
+        <div className="mx-auto max-w-[1280px] px-4 py-4 text-xs text-muted-foreground sm:px-6">
+          EV Charging Intelligence &amp; Optimization Platform. Operator and driver views
+          over the FastAPI service; metrics reflect a synthetic dataset (see the README).
         </div>
       </footer>
     </div>
@@ -63,14 +84,15 @@ function NavLink({
   return (
     <Link
       href={href}
+      aria-current={active ? "page" : undefined}
       className={cn(
-        "flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-sm font-medium transition-colors",
+        "flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[0.8125rem] font-medium transition-colors",
         active
-          ? "bg-surface-2 text-text-primary"
-          : "text-text-secondary hover:text-text-primary",
+          ? "bg-primary/10 text-primary"
+          : "text-muted-foreground hover:bg-muted hover:text-foreground",
       )}
     >
-      <Icon className="h-4 w-4" />
+      <Icon className="size-4" />
       <span className="hidden md:inline">{label}</span>
     </Link>
   );

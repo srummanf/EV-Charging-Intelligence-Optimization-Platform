@@ -4,6 +4,9 @@ The original brief is preserved in full in the appendix of
 [`../PLAN.md`](../PLAN.md). This file summarises it and, for each part, records **what
 actually shipped** and **why it differs**.
 
+**Dataset:** [Electric Vehicle Charging Patterns](https://www.kaggle.com/datasets/valakhorasani/electric-vehicle-charging-patterns)
+by Vala Khorasani (Kaggle) — synthetic; see [`../data/README.md`](../data/README.md).
+
 ## The idea
 
 > Build a single end-to-end ML platform that answers: *"What is happening across EV

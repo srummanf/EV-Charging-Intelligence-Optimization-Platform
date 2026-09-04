@@ -32,11 +32,17 @@ npm run lint                       # eslint (flat config)
 
 ## Design
 
-- **Theme-aware.** Light/dark tokens in `app/globals.css`; `next-themes` toggle
-  (`data-theme` attribute), system default.
-- **Charts** follow the project data-viz palette — validated categorical hues
-  (blue / orange / aqua), one y-axis, legend for ≥2 series, hover tooltips, recessive
-  grid. Colours are CSS variables so they swap with the theme.
+- **shadcn/ui "new-york" style**, dark-first (this is an ops console). Primitives live
+  in `components/ui/` (owned source, not a dependency), built on the unified `radix-ui`
+  package + `class-variance-authority`. OKLCH design tokens in `app/globals.css`.
+- **Typography.** Geist Sans for UI, Geist Mono for tabular data (`.nums`).
+- **Theme-aware.** `next-themes` toggle (`data-theme` attribute), system default; every
+  token has a light and dark value.
+- **Charts** use the project data-viz palette — colour-blind-validated categorical hues
+  (blue / orange / aqua), one y-axis, area fills under lines, legend for ≥2 series, hover
+  tooltips, recessive grid. Colours are CSS variables so they swap with the theme.
+- **Stats** share hairline dividers (`components/stat.tsx`) rather than floating as
+  separate cards; the anomaly reason drawer is a Radix `Sheet`.
 - Data pages are dynamic Server Components (`fetch` with `cache: "no-store"`);
   interactive bits (`/anomalies`, `/forecast`, `/my-charging`) hydrate as Client
   Components.
@@ -46,12 +52,12 @@ npm run lint                       # eslint (flat config)
 ```
 web/
 ├── app/
-│   ├── layout.tsx            shell + theme provider
+│   ├── layout.tsx            shell + theme provider + Geist fonts
 │   ├── overview/ analytics/ segments/ anomalies/ forecast/ my-charging/
-│   └── globals.css           design tokens
+│   └── globals.css           OKLCH design tokens
 ├── components/
-│   ├── app-shell.tsx  theme-toggle.tsx  charts.tsx  kpi-card.tsx  states.tsx
-│   └── ui/            card, button, badge, table, tabs, field
+│   ├── app-shell.tsx  theme-toggle.tsx  charts.tsx  stat.tsx  states.tsx  page-header.tsx
+│   └── ui/            card · button · badge · table · tabs · field · separator · sheet · skeleton
 └── lib/
     ├── api.ts                typed client (ApiError, env base URL)
     └── types.ts              response shapes (kept in sync with api/schemas.py)

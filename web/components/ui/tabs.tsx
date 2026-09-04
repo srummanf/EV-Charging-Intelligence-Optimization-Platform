@@ -1,41 +1,55 @@
 "use client";
 
 import * as React from "react";
+import { Tabs as TabsPrimitive } from "radix-ui";
 import { cn } from "@/lib/utils";
 
-interface TabsProps {
-  tabs: { value: string; label: string }[];
-  children: (active: string) => React.ReactNode;
-  initial?: string;
+export const Tabs = TabsPrimitive.Root;
+
+export function TabsList({
+  className,
+  ...props
+}: React.ComponentProps<typeof TabsPrimitive.List>) {
+  return (
+    <TabsPrimitive.List
+      className={cn(
+        "inline-flex h-9 items-center gap-1 rounded-lg border bg-muted/60 p-1 text-muted-foreground",
+        className,
+      )}
+      {...props}
+    />
+  );
 }
 
-export function Tabs({ tabs, children, initial }: TabsProps) {
-  const [active, setActive] = React.useState(initial ?? tabs[0]?.value);
-
+export function TabsTrigger({
+  className,
+  ...props
+}: React.ComponentProps<typeof TabsPrimitive.Trigger>) {
   return (
-    <div className="flex flex-col gap-4">
-      <div
-        role="tablist"
-        className="flex flex-wrap gap-1 rounded-lg border bg-surface-2 p-1"
-      >
-        {tabs.map((tab) => (
-          <button
-            key={tab.value}
-            role="tab"
-            aria-selected={active === tab.value}
-            onClick={() => setActive(tab.value)}
-            className={cn(
-              "rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
-              active === tab.value
-                ? "bg-surface text-text-primary shadow-sm"
-                : "text-text-secondary hover:text-text-primary",
-            )}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
-      <div>{children(active)}</div>
-    </div>
+    <TabsPrimitive.Trigger
+      className={cn(
+        "inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-md px-3 py-1 text-sm font-medium",
+        "outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring/60",
+        "disabled:pointer-events-none disabled:opacity-50",
+        "data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-sm",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
+export function TabsContent({
+  className,
+  ...props
+}: React.ComponentProps<typeof TabsPrimitive.Content>) {
+  return (
+    <TabsPrimitive.Content
+      className={cn(
+        "mt-4 outline-none focus-visible:ring-2 focus-visible:ring-ring/60",
+        className,
+      )}
+      {...props}
+    />
   );
 }

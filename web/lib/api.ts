@@ -12,7 +12,7 @@ import type {
 } from "./types";
 
 // The browser always uses the public URL. Server-side (RSC data fetching) prefers an
-// internal URL when set — in Docker Compose the API is reachable as http://api:8000 from
+// internal URL when set, in Docker Compose the API is reachable as http://api:8000 from
 // the web container but as http://localhost:8000 from the user's browser.
 const PUBLIC_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
 const SERVER_BASE =

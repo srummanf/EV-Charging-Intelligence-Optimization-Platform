@@ -24,7 +24,7 @@ ev/
 
 | Path | What it is |
 | --- | --- |
-| `data/raw/ev_charging_patterns.csv` | The single source: 1,320 synthetic charging sessions, 20 columns. **Committed.** |
+| `data/raw/ev_charging_patterns.csv` | The single source: 1,320 synthetic charging sessions, 20 columns. **Committed.** From [Kaggle](https://www.kaggle.com/datasets/valakhorasani/electric-vehicle-charging-patterns). |
 | `data/processed/sessions_clean.parquet` | 1,320 × 57 — canonical names, engineered features, 9 validation flags. Git-ignored; written by `scripts/prepare_data.py`. |
 | `data/processed/validation_report.json` | Per-rule violation counts and percentages. Git-ignored. |
 | `data/processed/analytics.json` | The precomputed dashboard payload. Git-ignored; written by `scripts/train_all.py` / `build_analytics.py`. |
@@ -105,20 +105,21 @@ Next.js App Router + TypeScript + Tailwind v4 + Recharts.
 
 | Path | Responsibility |
 | --- | --- |
-| `app/layout.tsx` | Root layout: theme provider + `AppShell` (nav + footer). |
+| `app/layout.tsx` | Root layout: theme provider + `AppShell` (nav + footer) + Geist fonts. |
 | `app/page.tsx` | Redirects `/` → `/overview`. |
-| `app/globals.css` | Design tokens (light/dark), Tailwind import. |
-| `app/overview/page.tsx` | KPI cards, data-quality summary, service status. |
+| `app/globals.css` | OKLCH design tokens (light/dark), Tailwind import, sheet animations. |
+| `app/overview/page.tsx` | Stat grids, hourly-energy chart, data-quality bar, service status. |
 | `app/analytics/page.tsx` + `analytics-view.tsx` | Tabbed breakdowns (time / weekday / charger / vehicle / city). |
 | `app/segments/page.tsx` | Cluster archetype cards + table. |
 | `app/anomalies/page.tsx` + `anomalies-table.tsx` | Sortable / risk-filterable table with a slide-in reason drawer. |
 | `app/forecast/page.tsx` + `forecast-chart.tsx` | 72 h actual vs 24 h recursive forecast line chart. |
 | `app/my-charging/page.tsx` + `charging-form.tsx` | Driver form → `POST /recommend` → plan + charger comparison. |
-| `components/app-shell.tsx` | Top nav (operator + driver links), theme toggle mount. |
+| `components/app-shell.tsx` | Top nav (operator + driver links), product mark, theme toggle. |
 | `components/theme-provider.tsx` / `theme-toggle.tsx` | `next-themes`, `data-theme` attribute. |
-| `components/charts.tsx` | `BarChartCard`, `LineChartCard` — Recharts wrappers with the project palette. |
-| `components/kpi-card.tsx`, `page-header.tsx`, `states.tsx` | Small presentational pieces (`states.tsx` = the API-error card). |
-| `components/ui/*` | Hand-written primitives: `card`, `button`, `badge`, `table`, `tabs`, `field`. |
+| `components/charts.tsx` | `BarChartCard`, `AreaChartCard`, `Sparkline` — Recharts wrappers on the project palette. |
+| `components/stat.tsx` | `StatGrid` / `Stat` / `MiniBar` — the KPI treatment (shared hairline dividers). |
+| `components/page-header.tsx`, `states.tsx` | Page title / section headings; `states.tsx` = the API-error + empty-state cards. |
+| `components/ui/*` | shadcn/ui-style primitives (owned source, radix-ui + cva): `card`, `button`, `badge`, `table`, `tabs`, `field`, `separator`, `sheet`, `skeleton`. |
 | `lib/api.ts` | Typed API client. `ApiError`; browser uses `NEXT_PUBLIC_API_BASE_URL`, SSR uses `INTERNAL_API_BASE_URL`. |
 | `lib/types.ts` | TypeScript types mirroring `api/schemas.py`. |
 | `lib/utils.ts` | `cn()` (class merge), `num()`, `usd()` formatters. |

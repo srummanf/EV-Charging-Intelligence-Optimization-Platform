@@ -115,9 +115,12 @@ anomaly,demand}`, `scripts/train_all.py`, `models/metrics.json`,
 
 **Key decisions**
 
-- **Hand-written UI primitives, not the shadcn CLI.** The shadcn v4 CLI was slow and
-  pulled in `@base-ui/react`; the six primitives this project needs (`card`, `button`,
-  `badge`, `table`, `tabs`, `field`) are ~30 lines each with Tailwind + `cva`.
+- **shadcn/ui "new-york" style, primitives owned as source.** Built on the unified
+  `radix-ui` package + `class-variance-authority` (the shadcn CLI itself was too slow in
+  this environment). Dark-first OKLCH token system in `globals.css`, Geist Sans + Geist
+  Mono, a single blue accent. `components/ui/`: card, button, badge, table, tabs,
+  field, separator, sheet, skeleton. Stats share hairline dividers (`stat.tsx`) rather
+  than floating as cards; the anomaly reason drawer is a Radix `Sheet`.
 - **Server Components for data, Client Components for interaction.** Data pages fetch on
   the server; only `anomalies` (sort + drawer), `forecast` (chart), and `my-charging`
   (form) ship client JS.

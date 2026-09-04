@@ -1,10 +1,18 @@
 # Data
 
+## Source
+
+**Electric Vehicle Charging Patterns** by Vala Khorasani, on Kaggle:
+<https://www.kaggle.com/datasets/valakhorasani/electric-vehicle-charging-patterns>
+
+Downloaded and committed unmodified as `raw/ev_charging_patterns.csv`. Refer to the
+Kaggle dataset page for its license and terms of use. It is **synthetic** — published
+for practising machine-learning workflows, **not** a reliable source for research or
+publication.
+
 ## `raw/ev_charging_patterns.csv`
 
-The single source file: **1,320 EV charging sessions**, 20 columns, spanning
-2024-01-01 to 2024-02-24. Synthetic dataset published for practising machine-learning
-workflows — **not** a reliable source for research or publication.
+**1,320 EV charging sessions**, 20 columns, spanning 2024-01-01 to 2024-02-24.
 
 | Column | Meaning |
 | --- | --- |

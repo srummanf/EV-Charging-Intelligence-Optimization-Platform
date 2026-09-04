@@ -7,8 +7,10 @@ themselves are in [BENCHMARK_RESULTS.md](BENCHMARK_RESULTS.md); regenerate them 
 ## The headline
 
 **On this dataset, the predictive models cannot beat trivial baselines — and that is a
-finding, not a bug.** The dataset is synthetic and was generated column by column, so
-the cross-column relationships a real charging network would have are absent.
+finding, not a bug.** The dataset
+([Electric Vehicle Charging Patterns](https://www.kaggle.com/datasets/valakhorasani/electric-vehicle-charging-patterns),
+Kaggle) is synthetic and was generated column by column, so the cross-column
+relationships a real charging network would have are absent.
 
 ## Finding 1 — The data is internally inconsistent
 

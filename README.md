@@ -204,7 +204,8 @@ produced.
 | Experiment tracking | MLflow *(optional)* | `train_all.py --track` logs runs to `sqlite:///mlflow.db` |
 | Backend | FastAPI, Uvicorn, Pydantic v2 | REST API over the models and analytics payload |
 | Frontend | Next.js (App Router), React 19, TypeScript | operator & driver dashboard |
-| Styling / charts | Tailwind CSS v4, Recharts, lucide-react, next-themes | theme-aware UI and charts |
+| UI | shadcn/ui-style primitives (radix-ui + cva), Tailwind CSS v4, Geist fonts, lucide-react, next-themes | dark-first "new-york" design system, theme-aware |
+| Charts | Recharts | area / bar charts on the project data-viz palette |
 | Notebooks | Jupyter | the 9 worked analysis notebooks |
 | Testing | pytest, FastAPI `TestClient`, ESLint | 69 Python tests + web lint |
 | Lint / format | Ruff | Python lint + format |
@@ -359,8 +360,11 @@ Per-directory detail also lives in `data/README.md`, `api/README.md`, `web/READM
 
 ### Raw input — `data/raw/ev_charging_patterns.csv`
 
+**Source:** [Electric Vehicle Charging Patterns](https://www.kaggle.com/datasets/valakhorasani/electric-vehicle-charging-patterns)
+by Vala Khorasani (Kaggle), committed unmodified.
+
 **1,320 sessions, 20 columns**, 2024-01-01 to 2024-02-24, 462 stations, 5 US cities.
-Synthetic; **not** valid for research. Key columns (full dictionary in
+Synthetic; **not** valid for research. Key columns (full dictionary and license note in
 [`data/README.md`](data/README.md)):
 
 | Column (raw) | Meaning | Notes |
@@ -772,5 +776,7 @@ Nothing here is a committed plan; `PLAN.md` phases 1–6 are all done.
 
 ---
 
-*The dataset is synthetic and included for demonstration only; it is not a reliable
-source for research or publication. See [`data/README.md`](data/README.md).*
+*Data: [Electric Vehicle Charging Patterns](https://www.kaggle.com/datasets/valakhorasani/electric-vehicle-charging-patterns)
+by Vala Khorasani (Kaggle) — synthetic, included for demonstration only, not a reliable
+source for research or publication. License terms are on the Kaggle page. See
+[`data/README.md`](data/README.md).*

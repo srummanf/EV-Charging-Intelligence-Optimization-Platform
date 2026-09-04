@@ -116,8 +116,9 @@ sequenceDiagram
 
 ### Raw session (`ev_charging_patterns.csv`)
 
-20 columns. Full dictionary: [`../../data/README.md`](../../data/README.md). The columns
-that matter for design:
+Source: [Electric Vehicle Charging Patterns](https://www.kaggle.com/datasets/valakhorasani/electric-vehicle-charging-patterns)
+(Kaggle, synthetic). 20 columns. Full dictionary and license note:
+[`../../data/README.md`](../../data/README.md). The columns that matter for design:
 
 - `User ID` unique per row → **session-level** analysis, not user-level.
 - `Charging Start/End Time` form a perfect 55 × 24 hourly grid → forecast **energy per

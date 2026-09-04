@@ -1,7 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, Zap } from "lucide-react";
+import {
+  ArrowRight,
+  BatteryCharging,
+  Clock,
+  DollarSign,
+  Loader2,
+  Sparkles,
+} from "lucide-react";
 import { api, ApiError } from "@/lib/api";
 import type { Recommendation, RecommendationInput } from "@/lib/types";
 import { USER_TYPES, VEHICLE_MODELS } from "@/lib/types";
@@ -10,7 +17,10 @@ import { Button } from "@/components/ui/button";
 import { Fieldset, Input, Select } from "@/components/ui/field";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Table, TD, TH, THead, TR } from "@/components/ui/table";
+import { Separator } from "@/components/ui/separator";
+import { EmptyState } from "@/components/states";
+import { Table, TBody, TD, TH, THead, TR } from "@/components/ui/table";
+import { DotField } from "@/components/ui/metric-visuals";
 
 const DEFAULTS: RecommendationInput = {
   vehicle_model: "Tesla Model 3",
@@ -30,7 +40,10 @@ export function ChargingForm() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  function set<K extends keyof RecommendationInput>(key: K, value: RecommendationInput[K]) {
+  function set<K extends keyof RecommendationInput>(
+    key: K,
+    value: RecommendationInput[K],
+  ) {
     setForm((f) => ({ ...f, [key]: value }));
   }
 
@@ -49,8 +62,8 @@ export function ChargingForm() {
   }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,360px)_1fr]">
-      <Card>
+    <div className="grid gap-4 lg:grid-cols-[340px_1fr]">
+      <Card className="h-fit">
         <CardHeader>
           <CardTitle>Your charge</CardTitle>
         </CardHeader>
@@ -68,19 +81,21 @@ export function ChargingForm() {
               </Select>
             </Fieldset>
 
-            <Fieldset label="Battery capacity (kWh)" htmlFor="cap">
+            <Fieldset label="Battery capacity" htmlFor="cap" hint="kWh">
               <Input
                 id="cap"
                 type="number"
                 min={10}
                 max={250}
                 value={form.battery_capacity_kwh}
-                onChange={(e) => set("battery_capacity_kwh", Number(e.target.value))}
+                onChange={(e) =>
+                  set("battery_capacity_kwh", Number(e.target.value))
+                }
               />
             </Fieldset>
 
             <div className="grid grid-cols-2 gap-3">
-              <Fieldset label="SOC now (%)" htmlFor="s0">
+              <Fieldset label="SOC now" htmlFor="s0" hint="%">
                 <Input
                   id="s0"
                   type="number"
@@ -90,7 +105,7 @@ export function ChargingForm() {
                   onChange={(e) => set("soc_start_pct", Number(e.target.value))}
                 />
               </Fieldset>
-              <Fieldset label="SOC target (%)" htmlFor="s1">
+              <Fieldset label="SOC target" htmlFor="s1" hint="%">
                 <Input
                   id="s1"
                   type="number"
@@ -102,7 +117,7 @@ export function ChargingForm() {
               </Fieldset>
             </div>
 
-            <Fieldset label="Distance since last charge (km)" htmlFor="dist">
+            <Fieldset label="Distance since last charge" htmlFor="dist" hint="km">
               <Input
                 id="dist"
                 type="number"
@@ -113,7 +128,7 @@ export function ChargingForm() {
             </Fieldset>
 
             <div className="grid grid-cols-2 gap-3">
-              <Fieldset label="Earliest start (hour)" htmlFor="eh">
+              <Fieldset label="Earliest start" htmlFor="eh" hint="hour 0-23">
                 <Input
                   id="eh"
                   type="number"
@@ -123,7 +138,7 @@ export function ChargingForm() {
                   onChange={(e) => set("earliest_hour", Number(e.target.value))}
                 />
               </Fieldset>
-              <Fieldset label="Hours available" htmlFor="ha">
+              <Fieldset label="Time available" htmlFor="ha" hint="hours">
                 <Input
                   id="ha"
                   type="number"
@@ -147,13 +162,14 @@ export function ChargingForm() {
               </Select>
             </Fieldset>
 
-            <Button type="submit" disabled={loading} className="w-full">
+            <Button type="submit" size="lg" disabled={loading} className="w-full">
               {loading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="animate-spin" />
               ) : (
-                <Zap className="h-4 w-4" />
+                <>
+                  Get recommendation <ArrowRight />
+                </>
               )}
-              Get recommendation
             </Button>
           </form>
         </CardContent>
@@ -161,58 +177,85 @@ export function ChargingForm() {
 
       <div>
         {error && (
-          <Card className="border-critical/30 bg-critical/5">
-            <CardContent className="pt-5 text-sm text-text-secondary">{error}</CardContent>
-          </Card>
-        )}
-
-        {result && !error && <RecommendationCard rec={result} />}
-
-        {!result && !error && (
-          <div className="flex h-full min-h-64 items-center justify-center rounded-xl border border-dashed text-sm text-text-muted">
-            Fill in your charge and submit to see a recommended plan.
+          <div className="rounded-xl border border-danger/30 bg-danger/[0.04] p-4 text-sm text-muted-foreground">
+            {error}
           </div>
+        )}
+        {result && !error && <RecommendationView rec={result} />}
+        {!result && !error && (
+          <EmptyState
+            icon={<Sparkles className="size-5" />}
+            title="No plan yet"
+            message="Fill in your charge and submit to see a recommended plan."
+          />
         )}
       </div>
     </div>
   );
 }
 
-function RecommendationCard({ rec }: { rec: Recommendation }) {
+function RecommendationView({ rec }: { rec: Recommendation }) {
   return (
     <div className="space-y-4">
-      <Card>
-        <CardHeader>
-          <CardTitle>Recommended plan</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-            <span className="text-2xl font-semibold text-text-primary">
-              {rec.recommended_charger}
-            </span>
-            <Badge tone="info">start {rec.charging_window}</Badge>
+      <Card className="relative overflow-hidden">
+        <DotField accentStroke="var(--chart-1)" focus="90% 8%" />
+        <CardContent className="relative z-10 space-y-5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="text-xs font-medium text-muted-foreground">
+                Recommended charger
+              </p>
+              <p className="font-display text-[1.85rem] font-semibold leading-tight tracking-tight">
+                {rec.recommended_charger}
+              </p>
+            </div>
+            <Badge tone="primary" className="text-sm">
+              <Clock className="size-3.5" />
+              start {rec.charging_window}
+            </Badge>
           </div>
 
-          <div className="grid grid-cols-3 gap-3 text-sm">
-            <Metric label="Energy" value={`${num(rec.estimated_energy_kwh, 1)} kWh`} />
-            <Metric label="Time" value={`${num(rec.estimated_duration_hours, 2)} h`} />
-            <Metric label="Cost" value={usd(rec.estimated_cost_usd)} />
+          <div className="grid grid-cols-3 divide-x divide-border overflow-hidden rounded-lg border bg-card">
+            <BigMetric
+              icon={<BatteryCharging className="size-3.5" />}
+              label="Energy"
+              value={num(rec.estimated_energy_kwh, 1)}
+              unit="kWh"
+            />
+            <BigMetric
+              icon={<Clock className="size-3.5" />}
+              label="Time"
+              value={num(rec.estimated_duration_hours, 2)}
+              unit="h"
+            />
+            <BigMetric
+              icon={<DollarSign className="size-3.5" />}
+              label="Cost"
+              value={usd(rec.estimated_cost_usd).replace("$", "")}
+              unit="USD"
+            />
           </div>
 
-          <p className="text-sm text-text-secondary">{rec.reason}</p>
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            {rec.reason}
+          </p>
 
           {rec.session_archetype && (
-            <p className="text-xs text-text-muted">
-              Closest session archetype: {rec.session_archetype}
+            <p className="text-xs text-muted-foreground/80">
+              Closest archetype:{" "}
+              <span className="text-foreground">{rec.session_archetype}</span>
             </p>
           )}
 
           {rec.notes.length > 0 && (
-            <ul className="space-y-1 rounded-md bg-surface-2 p-3 text-xs text-text-secondary">
-              {rec.notes.map((n, i) => (
-                <li key={i}>• {n}</li>
-              ))}
-            </ul>
+            <>
+              <Separator />
+              <ul className="space-y-2 border-l pl-3 text-xs text-muted-foreground">
+                {rec.notes.map((n, i) => (
+                  <li key={i}>{n}</li>
+                ))}
+              </ul>
+            </>
           )}
         </CardContent>
       </Card>
@@ -220,33 +263,48 @@ function RecommendationCard({ rec }: { rec: Recommendation }) {
       <Card>
         <CardHeader>
           <CardTitle>Compare charger types</CardTitle>
+          <p className="text-xs text-muted-foreground">
+            Same energy and cost. Only the time differs
+          </p>
         </CardHeader>
-        <CardContent>
-          <Table className="tabular">
+        <CardContent className="p-0">
+          <Table>
             <THead>
               <TR>
-                <TH>Charger</TH>
-                <TH>Power</TH>
-                <TH>Time</TH>
-                <TH>Cost</TH>
+                <TH className="pl-5">Charger</TH>
+                <TH className="text-right">Power</TH>
+                <TH className="text-right">Time</TH>
+                <TH className="text-right">Cost</TH>
                 <TH>Fits budget</TH>
               </TR>
             </THead>
-            <tbody>
+            <TBody>
               {rec.options.map((o) => (
-                <TR key={o.charger_type}>
-                  <TD className="font-medium text-text-primary">{o.charger_type}</TD>
-                  <TD>{num(o.power_kw, 1)} kW</TD>
-                  <TD>{num(o.duration_hours, 2)} h</TD>
-                  <TD>{usd(o.cost_usd)}</TD>
+                <TR
+                  key={o.charger_type}
+                  data-state={
+                    o.charger_type === rec.recommended_charger
+                      ? "selected"
+                      : undefined
+                  }
+                >
+                  <TD className="pl-5 font-medium text-foreground">
+                    {o.charger_type}
+                  </TD>
+                  <TD num>{num(o.power_kw, 1)} kW</TD>
+                  <TD num>{num(o.duration_hours, 2)} h</TD>
+                  <TD num>{usd(o.cost_usd)}</TD>
                   <TD>
-                    <Badge tone={o.fits_time_budget ? "normal" : "medium"}>
+                    <Badge
+                      tone={o.fits_time_budget ? "normal" : "medium"}
+                      dot
+                    >
                       {o.fits_time_budget ? "yes" : "no"}
                     </Badge>
                   </TD>
                 </TR>
               ))}
-            </tbody>
+            </TBody>
           </Table>
         </CardContent>
       </Card>
@@ -254,11 +312,29 @@ function RecommendationCard({ rec }: { rec: Recommendation }) {
   );
 }
 
-function Metric({ label, value }: { label: string; value: string }) {
+function BigMetric({
+  icon,
+  label,
+  value,
+  unit,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  unit: string;
+}) {
   return (
-    <div className="rounded-md border p-3">
-      <p className="text-xs text-text-muted">{label}</p>
-      <p className="tabular text-base font-semibold text-text-primary">{value}</p>
+    <div className="space-y-1.5 p-3.5">
+      <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+        {icon}
+        {label}
+      </span>
+      <span className="font-display block text-[1.6rem] font-semibold leading-none tabular-nums tracking-tight">
+        {value}
+        <span className="ml-1 text-xs font-medium text-muted-foreground">
+          {unit}
+        </span>
+      </span>
     </div>
   );
 }

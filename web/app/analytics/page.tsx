@@ -1,6 +1,7 @@
 import { api, ApiError } from "@/lib/api";
 import { PageHeader } from "@/components/page-header";
 import { ApiErrorCard } from "@/components/states";
+import { Reveal } from "@/components/motion";
 import { AnalyticsView } from "./analytics-view";
 
 export const dynamic = "force-dynamic";
@@ -8,8 +9,13 @@ export const dynamic = "force-dynamic";
 export default async function AnalyticsPage() {
   let patterns;
   let locations;
+  let overview;
   try {
-    [patterns, locations] = await Promise.all([api.patterns(), api.locations()]);
+    [patterns, locations, overview] = await Promise.all([
+      api.patterns(),
+      api.locations(),
+      api.overview(),
+    ]);
   } catch (error) {
     if (error instanceof ApiError) {
       return (
@@ -26,9 +32,15 @@ export default async function AnalyticsPage() {
     <>
       <PageHeader
         title="Charging Analytics"
-        description="Behaviour breakdowns by time of day, weekday, charger type, vehicle model and city. Bars share one scale; hover for exact values."
+        description="Behaviour broken down by time, weekday, charger, vehicle and city. Every breakdown shares one scale; switch the measure and hover for exact values."
       />
-      <AnalyticsView patterns={patterns} locations={locations} />
+      <Reveal>
+        <AnalyticsView
+          patterns={patterns}
+          locations={locations}
+          overview={overview}
+        />
+      </Reveal>
     </>
   );
 }

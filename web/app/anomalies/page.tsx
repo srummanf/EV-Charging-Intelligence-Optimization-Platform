@@ -1,6 +1,7 @@
 import { api, ApiError } from "@/lib/api";
 import { PageHeader } from "@/components/page-header";
 import { ApiErrorCard } from "@/components/states";
+import { Reveal } from "@/components/motion";
 import { AnomaliesTable } from "./anomalies-table";
 
 export const dynamic = "force-dynamic";
@@ -25,9 +26,11 @@ export default async function AnomaliesPage() {
     <>
       <PageHeader
         title="Anomaly Monitor"
-        description="Isolation Forest score (0–1) over physical-consistency features. Click a row for the rule-based explanation. The model is complementary to the hard rules, not a replacement."
+        description="Isolation Forest score (0-1) over physical-consistency features. Click a row for the rule-based explanation. The model is complementary to the hard rules, not a replacement."
       />
-      <AnomaliesTable data={data} />
+      <Reveal>
+        <AnomaliesTable data={data} />
+      </Reveal>
     </>
   );
 }

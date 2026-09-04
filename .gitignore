@@ -9,6 +9,9 @@ dist/
 venv/
 .env
 
+.agents/
+.claude/
+
 # Jupyter
 .ipynb_checkpoints/
 
