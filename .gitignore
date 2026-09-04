@@ -19,8 +19,10 @@ venv/
 .coverage
 htmlcov/
 
-# MLflow
+# MLflow (train_all.py --track)
 mlruns/
+mlflow.db
+mlartifacts/
 
 # Project data artifacts (raw data is kept; derived data is regenerated)
 data/processed/*

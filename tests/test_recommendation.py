@@ -14,11 +14,13 @@ from evcharging.recommendation.strategy import (
     ChargingRecommendation,
     RecommendationRequest,
     best_charging_window,
+    compare_chargers,
     estimate_cost_usd,
     estimate_duration_hours,
     estimate_energy_kwh,
     nominal_power_kw,
     recommend,
+    recommend_batch,
     recommend_charger_type,
 )
 
@@ -152,6 +154,32 @@ def test_recommend_uses_supplied_demand_curve() -> None:
     )
     rec = recommend(req, demand_by_hour=demand)
     assert rec.start_hour in {2, 3, 4}
+
+
+def test_compare_chargers_same_energy_different_time() -> None:
+    req = RecommendationRequest(
+        vehicle_model="Nissan Leaf", battery_capacity_kwh=40,
+        soc_start_pct=20, soc_target_pct=80, hours_available=3,
+    )
+    rows = compare_chargers(req)
+    assert [r["charger_type"] for r in rows] == ["Level 1", "Level 2", "DC Fast Charger"]
+    # energy and cost identical across chargers, duration strictly decreasing
+    assert len({r["energy_kwh"] for r in rows}) == 1
+    assert rows[0]["duration_hours"] > rows[1]["duration_hours"] > rows[2]["duration_hours"]
+    # Level 1 cannot deliver 26 kWh in 3 h; DC can
+    assert rows[0]["fits_time_budget"] is False
+    assert rows[2]["fits_time_budget"] is True
+
+
+def test_recommend_batch_runs_every_request() -> None:
+    reqs = [
+        RecommendationRequest(vehicle_model="BMW i3", battery_capacity_kwh=42,
+                              soc_start_pct=s, soc_target_pct=s + 20)
+        for s in (10, 30, 50)
+    ]
+    recs = recommend_batch(reqs)
+    assert len(recs) == 3
+    assert all(isinstance(r, ChargingRecommendation) for r in recs)
 
 
 def test_recommend_flags_model_disagreement() -> None:

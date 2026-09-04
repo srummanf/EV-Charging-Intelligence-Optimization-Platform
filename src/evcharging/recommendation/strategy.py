@@ -182,6 +182,37 @@ def best_charging_window(
     return best_start, (best_start + span) % 24
 
 
+def compare_chargers(
+    request: RecommendationRequest, price_per_kwh: float = DEFAULT_PRICE_PER_KWH
+) -> list[dict]:
+    """Energy, time and cost for the same charge on each charger type.
+
+    The energy and cost are the same for all three (they depend only on the SOC swing);
+    the time differs. ``fits_time_budget`` says whether that charger finishes within
+    ``request.hours_available``. Useful for a "compare your options" table in the UI.
+    """
+    energy_kwh = min(
+        estimate_energy_kwh(
+            request.soc_start_pct, request.soc_target_pct, request.battery_capacity_kwh
+        ),
+        request.battery_capacity_kwh,
+    )
+    rows = []
+    for charger in CHARGER_TYPES_BY_SPEED:
+        duration = estimate_duration_hours(energy_kwh, charger)
+        rows.append(
+            {
+                "charger_type": charger,
+                "power_kw": nominal_power_kw(charger),
+                "energy_kwh": round(energy_kwh, 2),
+                "duration_hours": round(duration, 2),
+                "cost_usd": round(estimate_cost_usd(energy_kwh, price_per_kwh), 2),
+                "fits_time_budget": duration <= request.hours_available,
+            }
+        )
+    return rows
+
+
 # --- wiring -----------------------------------------------------------------------
 
 def _archetype_for(request: RecommendationRequest, energy_kwh: float,
@@ -204,47 +235,29 @@ def _archetype_for(request: RecommendationRequest, energy_kwh: float,
     return segmenter_bundle["archetypes"].get(cluster)
 
 
-def _energy_model_row(request: RecommendationRequest) -> pd.DataFrame:
-    """A single-row predictor frame in the exact column order the energy model expects."""
-    from evcharging.config import NOMINAL_BATTERY_KWH
-    from evcharging.models.regression import NUMERIC_PREDICTORS
-
-    vehicles = sorted(NOMINAL_BATTERY_KWH)  # the 5 known vehicle models
-    locations = ["Chicago", "Houston", "Los Angeles", "New York", "San Francisco"]
-    user_types = ["Casual Driver", "Commuter", "Long-Distance Traveler"]
-
-    values = {
-        "battery_capacity_kwh": request.battery_capacity_kwh,
-        "soc_start_pct": request.soc_start_pct,
-        "soc_end_pct": request.soc_target_pct,
-        "soc_delta_pct": request.soc_target_pct - request.soc_start_pct,
-        "distance_km": request.distance_km,
-        "temperature_c": request.temperature_c,
-        "vehicle_age_years": 3.0,
-        "charger_type_code": 1,
-        "hour": request.earliest_hour,
-        "weekday": 2,
-        "is_weekend": 0,
-    }
-    for v in vehicles:
-        values[f"vehicle_model_{v}"] = int(v == request.vehicle_model)
-    for loc in locations:
-        values[f"location_{loc}"] = 0
-    for ut in user_types:
-        values[f"user_type_{ut}"] = int(ut == request.user_type)
-
-    one_hot = sorted(c for c in values if c.startswith(
-        ("vehicle_model_", "location_", "user_type_")))
-    cols = NUMERIC_PREDICTORS + one_hot
-    return pd.DataFrame([[float(values[c]) for c in cols]], columns=cols)
-
-
 def _model_energy(request: RecommendationRequest, energy_model) -> float | None:
     """Run the trained energy regressor for a sanity-band value, or ``None`` on failure."""
     if energy_model is None:
         return None
+    from evcharging.models.regression import feature_row
+
+    row = feature_row(
+        vehicle_model=request.vehicle_model,
+        user_type=request.user_type,
+        battery_capacity_kwh=request.battery_capacity_kwh,
+        soc_start_pct=request.soc_start_pct,
+        soc_end_pct=request.soc_target_pct,
+        soc_delta_pct=request.soc_target_pct - request.soc_start_pct,
+        distance_km=request.distance_km,
+        temperature_c=request.temperature_c,
+        vehicle_age_years=3.0,
+        charger_type_code=1,
+        hour=request.earliest_hour,
+        weekday=2,
+        is_weekend=0,
+    )
     try:
-        return float(energy_model.predict(_energy_model_row(request))[0])
+        return float(energy_model.predict(row)[0])
     except Exception:
         return None
 
@@ -318,6 +331,18 @@ def recommend(
         model_energy_kwh=model_energy,
         notes=notes,
     )
+
+
+def recommend_batch(
+    requests: list[RecommendationRequest], **context
+) -> list[ChargingRecommendation]:
+    """Run :func:`recommend` for many requests with one shared context.
+
+    ``context`` is forwarded to every call (``demand_by_hour``, ``segmenter_bundle``,
+    ``energy_model``, ``price_per_kwh``), so the artifacts are loaded once by the caller
+    and reused.
+    """
+    return [recommend(req, **context) for req in requests]
 
 
 def load_context(models_dir=None) -> dict:

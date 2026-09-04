@@ -19,6 +19,7 @@ dependencies = [
 
 [project.optional-dependencies]
 viz = ["matplotlib>=3.8", "seaborn>=0.13", "shap>=0.44"]
+api = ["fastapi>=0.115", "uvicorn[standard]>=0.30", "httpx>=0.27"]
 dev = ["pytest>=8.0", "ruff>=0.4", "jupyter>=1.0", "ipykernel>=6.29"]
 tracking = ["mlflow>=2.12"]
 
@@ -26,8 +27,8 @@ tracking = ["mlflow>=2.12"]
 where = ["src"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
-pythonpath = ["src"]
+testpaths = ["tests", "api/tests"]
+pythonpath = ["src", "."]
 
 [tool.ruff]
 line-length = 100
@@ -44,3 +45,6 @@ select = ["E", "F", "I", "UP", "B"]
 # The scripts prepend src/ to sys.path before importing the package, so their
 # evcharging imports are deliberately not at the top of the file.
 "scripts/*.py" = ["E402"]
+# FastAPI's dependency-injection idiom (Depends/Query/Path in argument defaults) is
+# intentional and is what the framework documents.
+"api/**/*.py" = ["B008"]

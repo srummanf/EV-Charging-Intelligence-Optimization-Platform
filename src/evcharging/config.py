@@ -22,6 +22,10 @@ RAW_CSV = RAW_DIR / "ev_charging_patterns.csv"
 CLEAN_PARQUET = PROCESSED_DIR / "sessions_clean.parquet"
 VALIDATION_REPORT = PROCESSED_DIR / "validation_report.json"
 
+# Precomputed dashboard payload: KPIs, time/location/segment breakdowns and an anomaly
+# summary, written by ``scripts/build_analytics.py`` and served read-only by the API.
+ANALYTICS_JSON = PROCESSED_DIR / "analytics.json"
+
 # Phase 2 model artifacts. Every trained model is a joblib file here; metrics.json is the
 # single machine-readable scoreboard the README and the API both read.
 METRICS_JSON = MODELS_DIR / "metrics.json"

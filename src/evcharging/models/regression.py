@@ -50,11 +50,52 @@ NUMERIC_PREDICTORS = [
 ]
 ONE_HOT_PREFIXES = ["vehicle_model_", "location_", "user_type_"]
 
+# The fixed category sets in the dataset, used to build a predictor row from scratch
+# (e.g. for a single API request) without needing a reference DataFrame.
+VEHICLE_MODELS = ["BMW i3", "Chevy Bolt", "Hyundai Kona", "Nissan Leaf", "Tesla Model 3"]
+LOCATIONS = ["Chicago", "Houston", "Los Angeles", "New York", "San Francisco"]
+USER_TYPES = ["Casual Driver", "Commuter", "Long-Distance Traveler"]
+
 
 def predictor_columns(df: pd.DataFrame) -> list[str]:
     """The full predictor list for ``df``: the numeric columns plus every one-hot column."""
     one_hot = [c for c in df.columns if c.startswith(tuple(ONE_HOT_PREFIXES))]
     return NUMERIC_PREDICTORS + sorted(one_hot)
+
+
+def all_predictor_columns() -> list[str]:
+    """The canonical predictor column order for a fully-populated feature frame."""
+    one_hot = (
+        [f"vehicle_model_{v}" for v in VEHICLE_MODELS]
+        + [f"location_{loc}" for loc in LOCATIONS]
+        + [f"user_type_{u}" for u in USER_TYPES]
+    )
+    return NUMERIC_PREDICTORS + sorted(one_hot)
+
+
+def feature_row(
+    *,
+    vehicle_model: str | None = None,
+    location: str | None = None,
+    user_type: str | None = None,
+    **numeric,
+) -> pd.DataFrame:
+    """Build a single-row predictor frame in canonical column order.
+
+    Numeric predictors default to 0.0 unless passed as keyword arguments; the one-hot
+    column for each supplied ``vehicle_model`` / ``location`` / ``user_type`` is set to 1.
+    Used to score one ad-hoc request (the API, the recommender) through a trained model.
+    """
+    values = {col: float(numeric.get(col, 0.0)) for col in NUMERIC_PREDICTORS}
+    for prefix, choice, options in [
+        ("vehicle_model_", vehicle_model, VEHICLE_MODELS),
+        ("location_", location, LOCATIONS),
+        ("user_type_", user_type, USER_TYPES),
+    ]:
+        for opt in options:
+            values[f"{prefix}{opt}"] = 1.0 if opt == choice else 0.0
+    cols = all_predictor_columns()
+    return pd.DataFrame([[values[c] for c in cols]], columns=cols)
 
 
 def make_model_factories(

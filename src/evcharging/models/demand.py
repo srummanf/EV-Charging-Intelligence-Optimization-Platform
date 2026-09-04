@@ -157,6 +157,42 @@ def walk_forward(
     )
 
 
+def forecast_horizon(model, hourly: pd.DataFrame, horizon: int = 24) -> list[dict]:
+    """Recursively forecast the ``horizon`` hours after the end of ``hourly``.
+
+    Each step predicts one hour, then feeds that prediction back in as ``lag_1`` (and
+    into the rolling mean) for the next step. Future temperature is approximated by the
+    historical mean for that hour of day. Returns a list of
+    ``{timestamp, hour, predicted_energy_kwh}``.
+    """
+    history = hourly[TARGET].tolist()
+    last_ts = hourly.index[-1]
+    temp_by_hour = hourly.groupby("hour")["temperature_c"].mean()
+    fallback_temp = float(hourly["temperature_c"].mean())
+
+    out = []
+    for step in range(1, horizon + 1):
+        ts = last_ts + pd.Timedelta(hours=step)
+        feat = {
+            "hour": ts.hour,
+            "weekday": ts.dayofweek,
+            "is_weekend": int(ts.dayofweek >= 5),
+            "month": ts.month,
+            "temperature_c": float(temp_by_hour.get(ts.hour, fallback_temp)),
+            "lag_1": history[-1],
+            "lag_24": history[-24],
+            "roll_24_mean": float(np.mean(history[-24:])),
+        }
+        pred = float(model.predict(pd.DataFrame([feat])[DEMAND_FEATURES])[0])
+        history.append(pred)
+        out.append({
+            "timestamp": ts.isoformat(),
+            "hour": int(ts.hour),
+            "predicted_energy_kwh": round(pred, 2),
+        })
+    return out
+
+
 def train(df: pd.DataFrame | None = None, persist: bool = True):
     """Build the hourly series, run walk-forward validation, refit on all of it, persist."""
     from evcharging.config import CLEAN_PARQUET
