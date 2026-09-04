@@ -33,9 +33,8 @@ pythonpath = ["src", "."]
 [tool.ruff]
 line-length = 100
 target-version = "py310"
-# Notebooks follow STYLE_GUIDE.md / CODE_STYLE.md, not ruff. The templates there
-# deliberately put imports mid-cell "where first needed", which ruff's import rules
-# would fight. Lint the package, scripts and tests only.
+# Notebooks deliberately put imports mid-cell "where first needed", which ruff's
+# import rules would fight. Lint the package, scripts and tests only.
 extend-exclude = ["notebooks", "*.ipynb"]
 
 [tool.ruff.lint]
