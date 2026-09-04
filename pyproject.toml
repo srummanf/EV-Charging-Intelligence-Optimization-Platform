@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "evcharging"
+version = "0.1.0"
+description = "EV Charging Intelligence & Optimization Platform"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "pandas>=2.1",
+    "numpy>=1.26",
+    "pyarrow>=15.0",
+    "scikit-learn>=1.4",
+    "xgboost>=2.0",
+    "joblib>=1.3",
+]
+
+[project.optional-dependencies]
+viz = ["matplotlib>=3.8", "seaborn>=0.13", "shap>=0.44"]
+dev = ["pytest>=8.0", "ruff>=0.4", "jupyter>=1.0", "ipykernel>=6.29"]
+tracking = ["mlflow>=2.12"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+# Notebooks follow STYLE_GUIDE.md / CODE_STYLE.md, not ruff. The templates there
+# deliberately put imports mid-cell "where first needed", which ruff's import rules
+# would fight. Lint the package, scripts and tests only.
+extend-exclude = ["notebooks", "*.ipynb"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.ruff.lint.per-file-ignores]
+# The scripts prepend src/ to sys.path before importing the package, so their
+# evcharging imports are deliberately not at the top of the file.
+"scripts/*.py" = ["E402"]

@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.env
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Tooling
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# MLflow
+mlruns/
+
+# Project data artifacts (raw data is kept; derived data is regenerated)
+data/processed/*
+!data/processed/.gitkeep
+models/*
+!models/.gitkeep
+
+# Node / Next.js (added in Phase 5)
+node_modules/
+.next/
+out/
+
+# OS
+.DS_Store
+Thumbs.db
